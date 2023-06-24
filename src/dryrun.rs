@@ -1,11 +1,8 @@
-use std::{
-    path::PathBuf,
-    process::{Command, ExitCode},
-};
+use std::{io, path::PathBuf, process::Command};
 
-use crate::utils::{get_dir_contents, get_filenames};
+use crate::utils::{get_filenames, get_files};
 
-pub fn dryrun(path: PathBuf, number: usize) -> ExitCode {
+pub fn dryrun(path: PathBuf, number: usize) -> Result<(), io::Error> {
     let mut dryrun_dir = path.clone();
     dryrun_dir.push("dryrun");
 
@@ -14,17 +11,17 @@ pub fn dryrun(path: PathBuf, number: usize) -> ExitCode {
             "{:?} exists, but is not a directory. Dry run failed",
             dryrun_dir
         );
-        return ExitCode::FAILURE;
+        return Err(io::Error::from(io::ErrorKind::Other));
     }
 
     if !dryrun_dir.exists() {
         if let Err(e) = Command::new("mkdir").arg(dryrun_dir.as_os_str()).output() {
             eprintln!("Unable to make dryrun dir due to error {:?}", e);
-            return ExitCode::FAILURE;
+            return Err(e);
         }
     }
 
-    match get_dir_contents(&path) {
+    match get_files(&path) {
         Ok(files) => {
             for file in files {
                 let original_file = file.path();
@@ -43,8 +40,8 @@ pub fn dryrun(path: PathBuf, number: usize) -> ExitCode {
                 }
             }
         }
-        Err(e) => return e,
+        Err(e) => return Err(e),
     };
 
-    ExitCode::SUCCESS
+    Ok(())
 }

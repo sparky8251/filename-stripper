@@ -38,9 +38,15 @@ fn main() -> ExitCode {
     match cli.command.unwrap_or(Commands::DryRun) {
         Commands::DryRun => {
             println!("Doing dryrun...");
-            dryrun(cli.path, cli.number)
+            if dryrun(cli.path, cli.number).is_err() {
+                return ExitCode::FAILURE;
+            }
         }
-        Commands::Process => process(cli.path, cli.number),
+        Commands::Process => {
+            if process(cli.path, cli.number).is_err() {
+                return ExitCode::FAILURE;
+            }
+        }
     };
 
     ExitCode::SUCCESS

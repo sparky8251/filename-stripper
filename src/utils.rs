@@ -1,20 +1,13 @@
 use std::fs::DirEntry;
+use std::io;
 use std::path::{Path, PathBuf};
-use std::process::ExitCode;
 
-pub fn get_dir_contents(path: &PathBuf) -> Result<impl Iterator<Item = DirEntry>, ExitCode> {
-    let files = match path.read_dir() {
-        Ok(v) => v
-            .flatten()
-            .filter(|x| x.file_type().map(|f| f.is_file()).unwrap_or(false)),
-        Err(e) => {
-            eprintln!(
-                "Unable to read files in path {:?} due to error {:?}",
-                path, e
-            );
-            return Err(ExitCode::FAILURE);
-        }
-    };
+pub fn get_files(path: &Path) -> Result<Vec<DirEntry>, io::Error> {
+    let files = path
+        .read_dir()?
+        .flatten()
+        .filter(|x| x.file_type().map(|f| f.is_file()).unwrap_or(false))
+        .collect();
     Ok(files)
 }
 

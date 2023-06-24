@@ -1,9 +1,10 @@
-use std::{fs, path::PathBuf, process::ExitCode};
+use std::io;
+use std::{fs, path::PathBuf};
 
-use crate::utils::{get_dir_contents, get_filenames};
+use crate::utils::{get_filenames, get_files};
 
-pub fn process(path: PathBuf, number: usize) -> ExitCode {
-    match get_dir_contents(&path) {
+pub fn process(path: PathBuf, number: usize) -> Result<(), io::Error> {
+    match get_files(&path) {
         Ok(files) => {
             for file in files {
                 let original_file = file.path();
@@ -17,8 +18,8 @@ pub fn process(path: PathBuf, number: usize) -> ExitCode {
                 }
             }
         }
-        Err(e) => return e,
+        Err(e) => return Err(e),
     };
 
-    ExitCode::SUCCESS
+    Ok(())
 }
