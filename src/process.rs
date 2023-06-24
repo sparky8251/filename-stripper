@@ -9,7 +9,8 @@ pub fn process(path: PathBuf, number: usize) -> ExitCode {
     match get_dir_contents(&path) {
         Ok(files) => {
             for file in files {
-                let (original_file, renamed_file) = get_filenames(&file, number, &path, &path);
+                let original_file = file.path().file_stem().unwrap().to_os_string();
+                let renamed_file = get_filenames(&file, number, &path);
 
                 if let Err(e) = Command::new("mv")
                     .arg(&original_file)

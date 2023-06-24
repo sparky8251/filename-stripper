@@ -1,20 +1,12 @@
 use std::fs::DirEntry;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
 pub fn get_dir_contents(path: &PathBuf) -> Result<impl Iterator<Item = DirEntry>, ExitCode> {
     let files = match path.read_dir() {
-        Ok(v) => v.filter_map(|x| x.ok()).filter_map(|x| {
-            if let Ok(entry) = x.file_type() {
-                if entry.is_file() {
-                    Some(x)
-                } else {
-                    None
-                }
-            } else {
-                None
-            }
-        }),
+        Ok(v) => v
+            .flatten()
+            .filter(|x| x.file_type().map(|f| f.is_file()).unwrap_or(false)),
         Err(e) => {
             eprintln!(
                 "Unable to read files in path {:?} due to error {:?}",
@@ -26,20 +18,8 @@ pub fn get_dir_contents(path: &PathBuf) -> Result<impl Iterator<Item = DirEntry>
     Ok(files)
 }
 
-pub fn get_filenames(
-    file: &DirEntry,
-    number: usize,
-    origin_dir: &PathBuf,
-    dest_dir: &PathBuf,
-) -> (PathBuf, PathBuf) {
+pub fn get_filenames(file: &DirEntry, number: usize, dest_dir: &Path) -> PathBuf {
     let filename = String::from(file.path().file_name().unwrap().to_string_lossy());
     let trimmed_filename: String = filename.chars().skip(number).collect();
-
-    let mut original_file = origin_dir.clone();
-    original_file.push(filename);
-
-    let mut renamed_file = dest_dir.clone();
-    renamed_file.push(trimmed_filename);
-
-    (original_file, renamed_file)
+    dest_dir.join(trimmed_filename)
 }
