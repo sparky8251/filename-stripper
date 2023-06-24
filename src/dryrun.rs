@@ -27,7 +27,7 @@ pub fn dryrun(path: PathBuf, number: usize) -> ExitCode {
     match get_dir_contents(&path) {
         Ok(files) => {
             for file in files {
-                let original_file = file.path().file_stem().unwrap().to_os_string();
+                let original_file = file.path();
                 let renamed_file = get_filenames(&file, number, &dryrun_dir);
 
                 if let Err(e) = Command::new("ln")
