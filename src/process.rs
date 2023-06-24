@@ -1,5 +1,4 @@
-use std::io;
-use std::{fs, path::PathBuf};
+use std::{fs, io, path::PathBuf};
 
 use crate::utils::{get_filenames, get_files};
 

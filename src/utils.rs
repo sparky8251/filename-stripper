@@ -1,6 +1,8 @@
-use std::fs::DirEntry;
-use std::io;
-use std::path::{Path, PathBuf};
+use std::{
+    fs::DirEntry,
+    io,
+    path::{Path, PathBuf},
+};
 
 pub fn get_files(path: &Path) -> Result<Vec<DirEntry>, io::Error> {
     let files = path

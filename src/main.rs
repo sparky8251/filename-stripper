@@ -2,8 +2,7 @@ mod dryrun;
 mod process;
 mod utils;
 
-use std::path::PathBuf;
-use std::process::ExitCode;
+use std::{path::PathBuf, process::ExitCode};
 
 use clap::{Parser, Subcommand};
 
@@ -38,7 +37,7 @@ fn main() -> ExitCode {
     let result = match cli.command.unwrap_or(Commands::DryRun) {
         Commands::DryRun => {
             println!("Doing dryrun...");
-            dryrun(cli.path, cli.number)
+            dryrun(&cli.path, cli.number)
         }
         Commands::Process => process(cli.path, cli.number),
     };
