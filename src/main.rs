@@ -35,19 +35,18 @@ fn main() -> ExitCode {
         return ExitCode::FAILURE;
     }
 
-    match cli.command.unwrap_or(Commands::DryRun) {
+    let result = match cli.command.unwrap_or(Commands::DryRun) {
         Commands::DryRun => {
             println!("Doing dryrun...");
-            if dryrun(cli.path, cli.number).is_err() {
-                return ExitCode::FAILURE;
-            }
+            dryrun(cli.path, cli.number)
         }
-        Commands::Process => {
-            if process(cli.path, cli.number).is_err() {
-                return ExitCode::FAILURE;
-            }
-        }
+        Commands::Process => process(cli.path, cli.number),
     };
+
+    if let Err(e) = result {
+        eprintln!("final error was {:?}", e);
+        return ExitCode::FAILURE;
+    }
 
     ExitCode::SUCCESS
 }
